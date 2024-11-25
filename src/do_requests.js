@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {connectBridge,sendMessage} from './nostrBridge_client.js'
-import {send_task,update_task} from './sendtask.js'
+import {send_task,update_task} from './sendtaskNDK.js'
 export function doRequest(content,callback) {
        console.log(content.url)
        axios.get(content.url,{headers:content.headers})
@@ -13,10 +13,10 @@ export function doRequest(content,callback) {
 }
 
 //bridge message
-function handle_send_message(socket,message,req_task,finishTask){
+async function handle_send_message(socket,message,req_task,finishTask){
         if (message.action == "clientId" ){
             req_task["clientId"] = message.content
-            let taskevent = send_task (JSON.stringify(req_task));
+            let taskevent = await send_task (JSON.stringify(req_task));
             console.log("task id",taskevent.id)
         }
         if (message.action == 'message'){
@@ -32,11 +32,9 @@ function handle_send_message(socket,message,req_task,finishTask){
 
 export function sendRequest(req_task,finishTask){
 
-    
     connectBridge(req_task['Bridge'],(socket,message)=>{
             handle_send_message(socket,message,req_task,finishTask);
     });
-
 }
 
 //bridge message 
@@ -62,10 +60,11 @@ export async function recvRquest(data) {
     content['id'] = data.id
     return new Promise((resolve, reject) => { 
         if (content['Bridge'] && content['clientId']){ 
-            connectBridge(content['Bridge'],async (socket,message)=>{
-                await handle_recv_message(socket,message,content);
-                return resolve('recv done');
-            });
+		connectBridge(content['Bridge'],async (socket,message)=>{
+                      await handle_recv_message(socket,message,content);
+                      return resolve('recv done');
+                });
+
         } else {
 
                 return resolve('requests version not match');

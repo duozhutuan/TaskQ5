@@ -31,7 +31,10 @@ export function connectBridge(url,onmessage){
             }
         })
     };
-
+    socket.onerror =() =>{
+	console.log("Bridge server close or exit?");
+	
+    }
     return socket;
 }
 

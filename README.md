@@ -10,3 +10,15 @@ Because the public key is integrated within TaskQ5.
 
 # TaskQ5: A Distributed Task Distribution System Using Nostr
 TaskQ5 is a distributed multi-task system based on the Nostr protocol, using channels for task publishing and distribution. When users publish tasks like file transfers or web acceleration downloads, we leverage the NostrBridge bridge to facilitate data transfer. This approach allows multiple Nostr clients to exchange data directly, avoiding the use of Relay servers and reducing the need for temporary storage. 
+
+# send and receive task
+``` 
+# wait a new task
+node src/taskcenter.js
+``` 
+
+send a new task
+
+```
+node examples/sendrequest_task.js
+```

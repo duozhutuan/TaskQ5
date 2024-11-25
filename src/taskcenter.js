@@ -1,30 +1,26 @@
 import {sendRequest,recvRquest,requestTask} from './do_requests.js';
-import {recv_task} from './recvtask.js'; 
+import {recv_task} from './recvtaskNDK.js'; 
 import {channel_info,relays,relayServer} from './config.js'
 
 let dispatch = [
     requestTask
 ]
 
-async function start_execute()
-{
-    let tasks = await recv_task(channel_info.id)
-
-    if (tasks.length < 1) return ;
-
-    for (let data of tasks) {
-             try { 
-                let content = JSON.parse(data.content)
+async function handleEvent(Event){
+    
+   try {
+       console.log(Event.id)
+       let content = JSON.parse(Event.content)
              
-                for(let t of dispatch ){
-                    if (t["type"] == content["type"]) {
-                        await t.cb(data)   
-                    }
-                };   
-            } catch(e){
-                
-            }
-    }          
+       for(let t of dispatch ){
+          if (t["type"] == content["type"]) {
+            await t.cb(Event)   
+          }
+       };   
+  } catch(e){ }
+
 }
 
-setInterval(start_execute, 5000);  // 每5秒查询一次
+recv_task(channel_info.id,handleEvent)
+
+
