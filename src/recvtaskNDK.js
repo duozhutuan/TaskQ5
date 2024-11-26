@@ -27,9 +27,9 @@ export async function recv_task(eventid,handlerEvent ) {
 
     let sub = ndk.subscribe(filters,{},
                         relaySets,true)
-    sub.on("event" ,(Nevent) => {
+    sub.on("event" ,async (Nevent) => {
 	        
-    		handlerEvent(Nevent)
+    		await handlerEvent(Nevent)
     })
 
 

@@ -15,7 +15,7 @@ export let relayServer =  [  'wss://relay1.nostrchat.io',
   'wss://nos.lol',
 ];
 
-let hub = "wss://relay.duozhutuan.com/";
+let hub = "wss://bridge.duozhutuan.com/";
 //let hub = "";
 export let relays = relayServer.map(relay => hub + relay );
 

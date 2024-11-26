@@ -9,7 +9,6 @@ let dispatch = [
 async function handleEvent(Event){
     
    try {
-       console.log(Event.id)
        let content = JSON.parse(Event.content)
              
        for(let t of dispatch ){

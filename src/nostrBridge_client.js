@@ -32,7 +32,7 @@ export function connectBridge(url,onmessage){
         })
     };
     socket.onerror =() =>{
-	console.log("Bridge server close or exit?");
+	    //console.log("Bridge server close or exit?");
 	
     }
     return socket;
@@ -43,6 +43,7 @@ export function connectBridge(url,onmessage){
 export function sendMessage(socket,to,from,message) {
     const messageData = {
         action: 'message',
+        code: 200,
         from: from,  
         to: to,                   
         message: message
