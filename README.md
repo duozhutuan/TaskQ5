@@ -22,3 +22,21 @@ send a new task
 ```
 node examples/sendrequest_task.js
 ```
+
+### request format
+```
+let req_task_content = {
+    'type':'requests',
+    'url':'https://www.google.com', 
+    'headers' : {....
+            },
+    'Bridge':'wss://bridge.duozhutuan.com',
+    'clientId':'' //Automatic filling by the system
+}
+
+```
+
+url: You need the access URL.
+header: Customize your own header.
+
+
