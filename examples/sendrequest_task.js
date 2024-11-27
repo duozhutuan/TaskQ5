@@ -1,5 +1,6 @@
+import WebSocket from 'ws';
 
-import {sendRequest} from '../src/do_requests.js'
+
 
 let req_task_content = {
     'type':'requests',
@@ -12,12 +13,19 @@ let req_task_content = {
     'clientId':''
 }
 
-// get request content
-function savefile(content)
-{
-    console.log("save file length:" , content.data.length)
+let server="ws://localhost:8088/"
+let socket = new WebSocket(server);
+
+
+socket.onmessage = (message) => {
+    message = message.data
+    message = JSON.parse(message);
+    if (message.type=='response' && message.status == '200'){
+        console.log(message.data.length)
+    }
+};
+
+socket.onopen = () => {
+    console.log("connect ok,send a new task")
+    socket.send(JSON.stringify(req_task_content))
 }
-
-//connect to bridge server and send task
-sendRequest(req_task_content,savefile);
-

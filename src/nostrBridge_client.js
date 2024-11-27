@@ -1,21 +1,14 @@
 import WebSocket from 'ws';
 
-let connects = {}
 
 export function connectBridge(url,onmessage){
 
     
-    let socket;
-    if (connects[url]){
-        socket = connects[url];
-    } else {
-        socket = new WebSocket(url);
-    }
+    let socket = new WebSocket(url);
 
     // 连接成功时
     socket.onopen = () => {
-        console.log('Connected to WebSocket server');
-        connects[url] = socket;
+        console.log('recv a task from relay server, connected to Bridge server execute task');
     };
 
     // 监听从服务器返回的消息
@@ -25,11 +18,7 @@ export function connectBridge(url,onmessage){
     };
 
     socket.onclose = () =>{
-         Object.keys(connects).forEach((pubkey) => {
-            if (connects[url] === socket) {
-                delete connects[url];
-            }
-        })
+    
     };
     socket.onerror =() =>{
 	    //console.log("Bridge server close or exit?");

@@ -1,7 +1,7 @@
 import NDK ,{NDKPrivateKeySigner,NDKRelaySet,NDKEvent} from "@nostr-dev-kit/ndk";
 import "websocket-polyfill";
 
-import {channel_info,relays,relayServer} from './config.js'
+import {channel_info,relays,relayServer,rejectSelfTasks} from './config.js'
 import {        Keypub,
         Keypriv,
         bech32PrivateKey,
@@ -28,7 +28,10 @@ export async function recv_task(eventid,handlerEvent ) {
     let sub = ndk.subscribe(filters,{},
                         relaySets,true)
     sub.on("event" ,async (Nevent) => {
-	        
+	        if (rejectSelfTasks && Nevent.pubkey == Keypub){
+                console.log("rejectSelfTasks = true, Don't execute ",Keypub,"task")
+                return
+            }
     		await handlerEvent(Nevent)
     })
 

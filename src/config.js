@@ -19,3 +19,5 @@ let hub = "wss://bridge.duozhutuan.com/";
 //let hub = "";
 export let relays = relayServer.map(relay => hub + relay );
 
+export const rejectSelfTasks = true;
+
