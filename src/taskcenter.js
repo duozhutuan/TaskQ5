@@ -1,5 +1,5 @@
 import {sendRequest,recvRquest,requestTask} from './do_requests.js';
-import {recv_task} from './recvtaskNDK.js'; 
+import {recv_task} from './recvtask.js'; 
 import {channel_info,relays,relayServer} from './config.js'
 
 let dispatch = [

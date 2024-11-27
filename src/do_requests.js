@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {connectBridge,sendMessage} from './nostrBridge_client.js'
-import {send_task,update_task} from './sendtaskNDK.js'
+import {send_task,update_task} from './sendtask.js'
 export function doRequest(content,callback) {
        console.log(content.url)
        axios.get(content.url,{headers:content.headers})
@@ -14,6 +14,7 @@ export function doRequest(content,callback) {
 
 //bridge message
 async function handle_send_message(socket,message,req_task,finishTask){
+
         if (message.action == "clientId" ){
             req_task["clientId"] = message.content
             console.log("clientId:",message.content)
@@ -28,7 +29,7 @@ async function handle_send_message(socket,message,req_task,finishTask){
 
             if (content.type == 'response'){
                 console.log("Done EventId: ", content.eventid)
-                update_task("done",content.eventid)
+                update_task(req_task,content.eventid,content.identifer)
                 finishTask(content);
             }
         } 
@@ -62,13 +63,13 @@ function handle_recv_message(socket,message,reqcontent){
 
             let content = message.message
             if (content.type == "pong"){
-
                 doRequest(reqcontent,(data)=>{
                     console.log(reqcontent.id,data.length)
                     sendMessage(socket,message.from,message.to,
                                             {type:"response",
                                             data:data,
-                                            eventid:reqcontent.id});
+                                            eventid:reqcontent.id,
+                                            identifer:reqcontent.identifer});
                     return resolve(200);
                 })
             }
@@ -78,7 +79,13 @@ function handle_recv_message(socket,message,reqcontent){
 }
 export async function recvRquest(data) {
     let content = JSON.parse(data.content) 
+
+    if (content.status == 'done'){
+        return 
+    }
+
     content['id'] = data.id
+    content['identifer'] = data.tags[0][1]
     return new Promise((resolve, reject) => { 
         if (content['Bridge'] && content['clientId']){ 
 		connectBridge(content['Bridge'],async (socket,message)=>{

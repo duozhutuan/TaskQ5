@@ -1,9 +1,6 @@
-import { useWebSocketImplementation } from 'nostr-tools/pool';
-import WebSocket from "ws"
-useWebSocketImplementation(WebSocket);
+import NDK ,{NDKPrivateKeySigner,NDKRelaySet,NDKEvent} from "@nostr-dev-kit/ndk";
+import "websocket-polyfill";
 
-import { SimplePool } from 'nostr-tools/pool'
-import { finalizeEvent } from 'nostr-tools/pure'
 import {channel_info,relays,relayServer} from './config.js'
 import {        Keypub,
         Keypriv,
@@ -11,19 +8,30 @@ import {        Keypub,
         bech32PublicKey} from './getkey.js'
 
 
-const pool = new SimplePool()
+const ndk = new NDK({
+    explicitRelayUrls: relays,
+    devWriteRelayUrls: relays,
+    signer:new NDKPrivateKeySigner(Keypriv)
+});
+
+await ndk.connect();
+let relaySets =  NDKRelaySet.fromRelayUrls(ndk._explicitRelayUrls, ndk);
 
 
 
 let kind    = 42
 
 
-export async function recv_task(eventid ) {
-    let taskevent = {"kinds":[42],"#e":[eventid],"limit":30}
+export async function recv_task(eventid,handlerEvent ) {
+    let filters = {"kinds":[42],"#e":[eventid],"limit":30}
 
-    let tasks = await pool.querySync(relays,taskevent)
+    let sub = ndk.subscribe(filters,{},
+                        relaySets,true)
+    sub.on("event" ,async (Nevent) => {
+	        
+    		await handlerEvent(Nevent)
+    })
 
-    return tasks;
 
 }
 

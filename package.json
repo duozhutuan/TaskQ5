@@ -1,5 +1,8 @@
 {
     "type": "module",
+    "name": "TaskQ5",
+    "version": "1.1.0",
+    "main": "src/taskcenter.js",
     "dependencies": {
         "@nostr-dev-kit/ndk": "^2.10.7",
         "axios": "^1.7.7",

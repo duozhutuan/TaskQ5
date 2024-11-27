@@ -1,73 +1,69 @@
-import { useWebSocketImplementation } from 'nostr-tools/pool';
-import WebSocket from "ws"
-useWebSocketImplementation(WebSocket);
 
-import { SimplePool } from 'nostr-tools/pool'
-import { getPublicKey,getEventHash,finalizeEvent } from 'nostr-tools/pure'
+import NDK ,{NDKPrivateKeySigner,NDKRelaySet,NDKEvent} from "@nostr-dev-kit/ndk";
+import "websocket-polyfill";
+
 import {channel_info,relays,relayServer} from './config.js'
 import {        Keypub,
         Keypriv,
         bech32PrivateKey,
         bech32PublicKey} from './getkey.js'
 
-import {sendRequest} from './do_requests.js'
-
-const pool = new SimplePool()
 
 
 let kind    = 42
-let tags    =  [['e', channel_info.id, relayServer[0], 'root'],]
+let tags    =  [['d',''],['e', channel_info.id, relayServer[0], 'root'],]
+const ndk = new NDK({
+    explicitRelayUrls: relays,
+    devWriteRelayUrls: relays,
+    signer:new NDKPrivateKeySigner(Keypriv)
+});
 
-export function update_task(content,eventid) {
-    //reply event
-    let tags    =  [['e',channel_info.id,relayServer[0],'root'],
-                    ['e', eventid, relayServer[0], 'reply'],
-                    ['p',Keypub,relayServer[0]]]
-    let taskevent = {
-                kind,
-                tags,
-                pubkey: Keypub,
-                content,
-                created_at: Math.floor(Date.now() / 1000),
-                id: '',
-                sig: ''
-            }
-    //add id and sign 
-    taskevent = finalizeEvent(taskevent,Keypriv)
+await ndk.connect();
+let relaySets =  NDKRelaySet.fromRelayUrls(ndk._explicitRelayUrls, ndk);
 
-    Promise.all(pool.publish(relays, taskevent))
-    .then((results) => {
-        console.log('All publish results:', results);
-    })
-    .catch((error) => {
-        console.error('Publish failed:', error);
-    });
+export async function send_task(content){
+
+    //add identifer
+    let identifer = String(Date.now());
+    let tags1 = tags	
+    tags1[0][1] = identifer;
+
+    tags1.push(["published_at",identifer ])
+
+	const ndkEvent = new NDKEvent(ndk);
+	ndkEvent.kind = kind;
+	ndkEvent.content = content;
+	ndkEvent.tags = tags1;
+	await ndkEvent.sign()
+	let ok = await ndkEvent.publish(relaySets,2000,0);
+	return ndkEvent
+} 
+export async function update_task(content,eventid,identifer) {
+
+
+          if (content['status'] != 'done'){
+               // update new status
+               let Nevent = new NDKEvent(ndk);
+               let tags1 = tags	
+               tags1[0][1] = identifer;
+               tags1.push(["published_at",identifer ])
+               content['status'] = 'done';
+               Nevent.content = JSON.stringify(content);
+	           Nevent.kind = kind;
+	           Nevent.tags = tags1;
+               await Nevent.publish(relaySets,2000,0);
+
+               // delete old task
+               let Hevent = new NDKEvent(ndk);
+               Hevent.kind = 5
+               Hevent.tags = [ ['e',eventid],['k','42'] ]
+               Hevent.content = "task done";
+               await Hevent.publish(relaySets,2000,0)
+         }
 }
 
 
 
 
 
-export function send_task(content) {
-    let taskevent = {
-                kind,
-                tags,
-                pubkey: Keypub,
-                content,
-                created_at: Math.floor(Date.now() / 1000),
-                id: '',
-                sig: ''
-            }
-    //add id and sign 
-    taskevent = finalizeEvent(taskevent,Keypriv)
-
-    Promise.all(pool.publish(relays, taskevent))
-    .then((results) => {
-        console.log('All publish results:', results);
-    })
-    .catch((error) => {
-        console.error('Publish failed:', error);
-    });
-    return taskevent
-}
 
