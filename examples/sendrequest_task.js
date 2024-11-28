@@ -15,17 +15,18 @@ let req_task_content = {
 
 function handler_task(task_content){
     return new Promise((resolve, reject) => {
-        let server="ws://localhost:8088/"
+        let server="ws://localhost:8081/"
         let socket = new WebSocket(server);
 
 
         socket.onmessage = (message) => {
             message = message.data
             message = JSON.parse(message);
-            if (message.type=='response' && message.status == '200'){
-                console.log("taskFinisher:",message.taskFinisher,message.data.length)
+            if (message.type=='response'){
+                let response = message.response;
+                console.log(response.data.length,response.status)
                 socket.close()
-                resolve(message)
+                resolve(response)
             }
         };
 

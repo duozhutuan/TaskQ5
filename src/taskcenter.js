@@ -24,7 +24,7 @@ async function handleEvent(Event){
 recv_task(channel_info.id,handleEvent)
 
 
-let port = 8088
+let port = 8081
 const wss = new WebSocketServer({ port: port });
 
 
@@ -38,7 +38,7 @@ wss.on('connection', (ws,req) => {
         console.log("send to relay server type = ",message.type)
         if (message.type == 'requests'){
             sendRequest(message,(content)=>{
-                ws.send(JSON.stringify({type:"response",status:'200',data:content.data,taskFinisher:content.pubkey}))
+                ws.send(JSON.stringify(content))
             });
 
         }

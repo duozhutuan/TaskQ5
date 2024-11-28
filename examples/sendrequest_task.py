@@ -13,14 +13,16 @@ req_task_content = {
 }
 
 
-def handle_task(taskcontent,reponse):
-    server="ws://localhost:8088/"
+def handle_task(taskcontent,response):
+    server="ws://localhost:8081/"
     def on_message(ws, message):
-        global data;
+        
         message = json.loads(message)
-        if (message['type']=='response' and message['status'] == '200'):
-            print("taskFinisher:",message['taskFinisher'],len(message['data']))
-            reponse['data'] = message['data']
+        response['data'] = message['response']['data']
+        response['status'] = message['response']['status']
+        response['headers'] = message['response']['headers']
+        if (message['type']=='response'):
+            print(len(response['data']))
             ws.close()
     def on_open(ws):
         print("connect ok,send a new task")
@@ -35,6 +37,6 @@ def handle_task(taskcontent,reponse):
 
 
 if __name__ == "__main__":
-    reponse = {}
-    handle_task(req_task_content,reponse)
-    print(len(reponse['data']))
+    response = {}
+    handle_task(req_task_content,response)
+    print(len(response['data']),response['status'])

@@ -7,7 +7,7 @@ export function doRequest(content,callback) {
        console.log(content.url)
        axios.get(content.url,{headers:content.headers})
         .then(response=>{
-            callback(response.data)
+            callback(response)
         })
         .catch(error => {
             callback(null);
@@ -65,11 +65,16 @@ function handle_recv_message(socket,message,reqcontent){
 
             let content = message.message
             if (content.type == "pong"){
-                doRequest(reqcontent,(data)=>{
-                    console.log(reqcontent.id,data.length)
+                doRequest(reqcontent,(response)=>{
+                    if (response == null) return resolve(500);
+                    console.log(reqcontent.id,response.data.length)
                     sendMessage(socket,message.from,message.to,
                                             {type:"response",
-                                            data:data,
+                                            response:{
+                                                status:response.status,
+                                                data:response.data,
+                                                headers:response.headers
+                                            },
                                             eventid:reqcontent.id,
                                             pubkey:Keypub,
                                             identifer:reqcontent.identifer});
