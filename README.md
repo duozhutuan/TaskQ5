@@ -39,4 +39,15 @@ let req_task_content = {
 url: You need the access URL.
 header: Customize your own header.
 
+**Process Flow:**
+<img src="https://raw.githubusercontent.com/duozhutuan/taskq5/master/docs/taskq5.drawio.png" alt="drawing" />
+
+1. **PC A** sends a task to the **relays** server.
+2. **PC B** subscribes to the channel and retrieves the task sent by **PC A**.
+3. **PC B** sends the result to the **bridge server**.
+4. The **bridge server** forwards the result to **PC A**.
+
+**Note:** The task from **PC A** includes **PC A**'s ID on the bridge, allowing the bridge server to forward the result from **PC B** to **PC A**. The bridge server does not store any content; it only forwards messages.
+
+
 
