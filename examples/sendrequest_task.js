@@ -21,7 +21,7 @@ socket.onmessage = (message) => {
     message = message.data
     message = JSON.parse(message);
     if (message.type=='response' && message.status == '200'){
-        console.log(message.data.length)
+        console.log("taskFinisher:",message.taskFinisher,message.data.length)
     }
 };
 

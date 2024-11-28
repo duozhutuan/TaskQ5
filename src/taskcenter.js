@@ -38,7 +38,7 @@ wss.on('connection', (ws,req) => {
         console.log("send to relay server type = ",message.type)
         if (message.type == 'requests'){
             sendRequest(message,(content)=>{
-                ws.send(JSON.stringify({type:"response",status:'200',data:content.data}))
+                ws.send(JSON.stringify({type:"response",status:'200',data:content.data,taskFinisher:content.pubkey}))
             });
 
         }

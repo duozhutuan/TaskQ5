@@ -19,7 +19,7 @@ req_task_content = {
 def on_message(ws, message):
     message = json.loads(message)
     if (message['type']=='response' and message['status'] == '200'):
-      print(len(message['data']))
+      print("taskFinisher:",message['taskFinisher'],len(message['data']))
 
 def on_open(ws):
     print("connect ok,send a new task")

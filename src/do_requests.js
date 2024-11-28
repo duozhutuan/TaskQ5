@@ -1,6 +1,8 @@
 import axios from 'axios'
 import {connectBridge,sendMessage} from './nostrBridge_client.js'
 import {send_task,update_task} from './sendtask.js'
+import {Keypub} from './getkey.js'
+
 export function doRequest(content,callback) {
        console.log(content.url)
        axios.get(content.url,{headers:content.headers})
@@ -29,7 +31,7 @@ async function handle_send_message(socket,message,req_task,finishTask){
 
             if (content.type == 'response'){
                 console.log("Done EventId: ", content.eventid)
-                update_task(req_task,content.eventid,content.identifer)
+                update_task(req_task,content.eventid,content.identifer,content.pubkey)
                 finishTask(content);
             }
         } 
@@ -69,6 +71,7 @@ function handle_recv_message(socket,message,reqcontent){
                                             {type:"response",
                                             data:data,
                                             eventid:reqcontent.id,
+                                            pubkey:Keypub,
                                             identifer:reqcontent.identifer});
                     return resolve(200);
                 })

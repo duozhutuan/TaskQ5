@@ -38,7 +38,7 @@ export async function send_task(content){
 	let ok = await ndkEvent.publish(relaySets,2000,0);
 	return ndkEvent
 } 
-export async function update_task(content,eventid,identifer) {
+export async function update_task(content,eventid,identifer,pubkey) {
 
 
           if (content['status'] != 'done'){
@@ -48,6 +48,7 @@ export async function update_task(content,eventid,identifer) {
                tags1[0][1] = identifer;
                tags1.push(["published_at",identifer ])
                content['status'] = 'done';
+               content['taskFinisher_pubkey'] = pubkey;
                Nevent.content = JSON.stringify(content);
 	           Nevent.kind = kind;
 	           Nevent.tags = tags1;
