@@ -1,7 +1,6 @@
 import websocket 
 import json
 
-server="ws://localhost:8088/"
 req_task_content = {
     'type':'requests',
     'url':'https://www.google.com',
@@ -14,19 +13,19 @@ req_task_content = {
 }
 
 
+def handle_task(taskcontent,reponse):
+    server="ws://localhost:8088/"
+    def on_message(ws, message):
+        global data;
+        message = json.loads(message)
+        if (message['type']=='response' and message['status'] == '200'):
+            print("taskFinisher:",message['taskFinisher'],len(message['data']))
+            reponse['data'] = message['data']
+            ws.close()
+    def on_open(ws):
+        print("connect ok,send a new task")
+        ws.send(json.dumps(taskcontent))
 
-
-def on_message(ws, message):
-    message = json.loads(message)
-    if (message['type']=='response' and message['status'] == '200'):
-      print("taskFinisher:",message['taskFinisher'],len(message['data']))
-
-def on_open(ws):
-    print("connect ok,send a new task")
-    ws.send(json.dumps(req_task_content))
-
-
-if __name__ == "__main__":
     ws = websocket.WebSocketApp(server,
                                 on_open=on_open,
                                 on_message=on_message
@@ -34,3 +33,8 @@ if __name__ == "__main__":
 
     ws.run_forever()
 
+
+if __name__ == "__main__":
+    reponse = {}
+    handle_task(req_task_content,reponse)
+    print(len(reponse['data']))
