@@ -27,12 +27,15 @@ export async function recv_task(eventid,handlerEvent ) {
 
     let sub = ndk.subscribe(filters,{},
                         relaySets,true)
+
     sub.on("event" ,async (Nevent) => {
+
 	        if (rejectSelfTasks && Nevent.pubkey == Keypub){
                 console.log("rejectSelfTasks = true, Don't execute ",Keypub,"task")
                 return
             }
-    		await handlerEvent(Nevent)
+            handlerEvent(Nevent);
+
     })
 
 
