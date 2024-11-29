@@ -3,13 +3,18 @@ import {connectBridge,sendMessage} from './nostrBridge_client.js'
 import {send_task,update_task} from './sendtask.js'
 import {Keypub} from './getkey.js'
 
+
 export function doRequest(content,callback) {
-       console.log(content.url)
+       console.log(content.url )
+       if (typeof content.headers === 'string') {    
+            content.headers = JSON.parse(content.headers);
+       }
        axios.get(content.url,{headers:content.headers})
         .then(response=>{
             callback(response)
         })
         .catch(error => {
+            console.log(error)
             callback(null);
         });
 }
