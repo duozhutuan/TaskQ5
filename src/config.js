@@ -20,7 +20,7 @@ export let relayServer =  [
   'wss://at.nostrworks.com',  
   'wss://btc.klendazu.com',
   'wss://relay.nostrified.org',
-  'wss://news.utxo.one'
+  'wss://news.utxo.one',
   'wss://bitcoinmaximalists.online/',
   'wss://nostr.tbai.me:592/',
 
