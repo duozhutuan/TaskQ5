@@ -33,6 +33,7 @@ async function handle_send_message(socket,message,req_task,finishTask){
                 console.log("Done EventId: ", content.eventid)
                 update_task(req_task,content.eventid,content.identifer,content.pubkey)
                 finishTask(content);
+                socket.close();
             }
         } 
 }
