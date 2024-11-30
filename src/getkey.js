@@ -21,4 +21,5 @@ export const bech32PrivateKey = nip19.nsecEncode(Keypriv);
 export const bech32PublicKey = nip19.npubEncode(Keypub);
 
 console.log("Your public key:",bech32PublicKey)
+console.log("Your public key:",Keypub)
 
