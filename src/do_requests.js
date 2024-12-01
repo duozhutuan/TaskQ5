@@ -21,6 +21,7 @@ export function doRequest(content,callback) {
 
 //bridge message
 async function handle_send_message(socket,message,req_task,finishTask,progressValue){
+	console.log("progressValue",progressValue.val)
 
         if (message.action == "clientId" ){
             req_task["clientId"] = message.content
@@ -31,16 +32,16 @@ async function handle_send_message(socket,message,req_task,finishTask,progressVa
             let content = message.message
             if (content.type == 'ping'){
                 //swap from,to
-		if (progressValue == 0){
+		if (progressValue.val== 0){
                 	sendMessage(socket,message.from,message.to,{type:'pong'})
-			progressValue = 1;
+			progressValue.val = 1;
 		} else {
 			sendMessage(socket,message.from,message.to,{type:'taskTaken'})
 		}
             }
 
             if (content.type == 'response'){
-		progressValue = 2;    
+		progressValue.val = 2;    
                 console.log("Done EventId: ", content.eventid)
                 update_task(req_task,content.eventid,content.identifer,content.pubkey)
                 finishTask(content);
@@ -51,9 +52,9 @@ async function handle_send_message(socket,message,req_task,finishTask,progressVa
 
 
 export function sendRequest(req_task,finishTask){
-    let progressValue = 0
+    let progressValue = {val:0}
     connectBridge(req_task['Bridge'],(socket,message)=>{
-           processValue =  handle_send_message(socket,message,req_task,finishTask,progressValue);
+           handle_send_message(socket,message,req_task,finishTask,progressValue);
     });
 }
 
@@ -62,8 +63,8 @@ export function sendRequest(req_task,finishTask){
 //bridge message 
 
 function handle_recv_message(socket,message,reqcontent){
-   //console.log(message)
-   return new Promise((resolve, reject) => {    
+
+    return new Promise((resolve, reject) => {    
 
         if (message.action == "clientId"){
             let clientId = message.content;

@@ -35,7 +35,7 @@ export async function recv_task(eventid,handlerEvent ) {
 
     sub.on("event" ,async (Nevent) => {
 
-	        if (rejectSelfTasks && Nevent.pubkey == Keypub){
+	    if (rejectSelfTasks && Nevent.pubkey == Keypub){
                 console.log("rejectSelfTasks = true, Don't execute ",Keypub,"task")
                 return
             }
