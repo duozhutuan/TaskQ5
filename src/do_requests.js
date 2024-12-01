@@ -20,7 +20,7 @@ export function doRequest(content,callback) {
 }
 
 //bridge message
-async function handle_send_message(socket,message,req_task,finishTask){
+async function handle_send_message(socket,message,req_task,finishTask,progressValue){
 
         if (message.action == "clientId" ){
             req_task["clientId"] = message.content
@@ -31,10 +31,16 @@ async function handle_send_message(socket,message,req_task,finishTask){
             let content = message.message
             if (content.type == 'ping'){
                 //swap from,to
-                sendMessage(socket,message.from,message.to,{type:'pong'})
+		if (progressValue == 0){
+                	sendMessage(socket,message.from,message.to,{type:'pong'})
+			progressValue = 1;
+		} else {
+			sendMessage(socket,message.from,message.to,{type:'taskTaken'})
+		}
             }
 
             if (content.type == 'response'){
+		progressValue = 2;    
                 console.log("Done EventId: ", content.eventid)
                 update_task(req_task,content.eventid,content.identifer,content.pubkey)
                 finishTask(content);
@@ -45,9 +51,9 @@ async function handle_send_message(socket,message,req_task,finishTask){
 
 
 export function sendRequest(req_task,finishTask){
-
+    let progressValue = 0
     connectBridge(req_task['Bridge'],(socket,message)=>{
-            handle_send_message(socket,message,req_task,finishTask);
+           processValue =  handle_send_message(socket,message,req_task,finishTask,progressValue);
     });
 }
 
@@ -56,7 +62,8 @@ export function sendRequest(req_task,finishTask){
 //bridge message 
 
 function handle_recv_message(socket,message,reqcontent){
-    return new Promise((resolve, reject) => {    
+   //console.log(message)
+   return new Promise((resolve, reject) => {    
 
         if (message.action == "clientId"){
             let clientId = message.content;
@@ -70,7 +77,10 @@ function handle_recv_message(socket,message,reqcontent){
             }
 
             let content = message.message
-            if (content.type == "pong"){
+            if (content.type == "taskTaken"){
+		    return resolve(200);
+	    }
+	    if (content.type == "pong"){
                 doRequest(reqcontent,(response)=>{
                     if (response == null) return resolve(500);
                     console.log(reqcontent.id,response.data.length)
