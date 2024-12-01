@@ -43,5 +43,9 @@ export async function recv_task(eventid,handlerEvent ) {
 
     })
 
+    ndk.pool.on("relay:connect",(relay)=>{
+        relay.subscribe(sub, sub.filters);
+    })
+	
 }
 
