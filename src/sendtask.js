@@ -21,6 +21,14 @@ const ndk = new NDK({
 await ndk.connect();
 let relaySets =  NDKRelaySet.fromRelayUrls(ndk._explicitRelayUrls, ndk);
 
+
+    setInterval(() => {
+        ndk.pool.relays.forEach((relay, key) => {
+            relay.connectivity._connectionStats.attempts = 1;
+        });
+    }, 10000);
+
+
 export async function send_task(content){
 
     //add identifer

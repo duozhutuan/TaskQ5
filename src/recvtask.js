@@ -17,6 +17,11 @@ const ndk = new NDK({
 await ndk.connect();
 let relaySets =  NDKRelaySet.fromRelayUrls(ndk._explicitRelayUrls, ndk);
 
+    setInterval(() => {
+        ndk.pool.relays.forEach((relay, key) => {
+            relay.connectivity._connectionStats.attempts = 1;
+        });
+    }, 10000);
 
 
 let kind    = 42
@@ -37,7 +42,6 @@ export async function recv_task(eventid,handlerEvent ) {
             handlerEvent(Nevent);
 
     })
-
 
 }
 
