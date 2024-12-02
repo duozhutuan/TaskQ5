@@ -9,8 +9,18 @@ export function doRequest(content,callback) {
        if (typeof content.headers === 'string') {    
             content.headers = JSON.parse(content.headers);
        }
-       axios.get(content.url,{headers:content.headers})
+       axios.get(content.url,{headers:content.headers,responseType: 'arraybuffer'})
         .then(response=>{
+            const contentType = response.headers['content-type'];
+            let charset = 'utf-8'; 
+            const matches = contentType.match(/charset=([^;]+)/);
+            if (matches && matches[1]) {
+                        charset = matches[1].toLowerCase();
+                }
+            const decoder = new TextDecoder(charset);
+            const text = decoder.decode(new Uint8Array(response.data));
+            response.headers['content-length'] = text.length
+            response.data = text
             callback(response)
         })
         .catch(error => {
