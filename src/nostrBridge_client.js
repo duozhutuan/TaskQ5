@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-
+import {log} from './log.js'
 
 export function connectBridge(url,onmessage){
 
@@ -8,7 +8,7 @@ export function connectBridge(url,onmessage){
 
     // 连接成功时
     socket.onopen = () => {
-        console.log('recv a task from relay server, connected to Bridge server execute task');
+        log.cyan('recv a task from relay server, connected to Bridge server execute task');
     };
 
     // 监听从服务器返回的消息

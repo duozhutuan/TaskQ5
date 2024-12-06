@@ -32,7 +32,7 @@ function handler_task(task_content){
 
         socket.onopen = () => {
             console.log("connect ok,send a new task")
-            socket.send(JSON.stringify(req_task_content))
+            socket.send(JSON.stringify(task_content))
         }
         socket.onerror = (error) => {
             reject(error);  // 在错误时拒绝 Promise
@@ -43,6 +43,6 @@ function handler_task(task_content){
 
 (async () => {
     let response = await handler_task(req_task_content)
-    console.log(response.data.length)
+    console.log(response.data)
 })()
 
