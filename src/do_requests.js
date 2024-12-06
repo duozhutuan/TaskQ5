@@ -4,7 +4,9 @@ import {send_task,update_task} from './sendtask.js'
 import {Keypub} from './getkey.js'
 import {log} from './log.js'
 
-export function doRequest(content,callback) {
+axios.defaults.timeout = 5000; // 5秒
+
+export function doRequest(content,callback,times=0) {
        log.blue(content.url )
        if (typeof content.headers === 'string') {    
             content.headers = JSON.parse(content.headers);
@@ -24,8 +26,11 @@ export function doRequest(content,callback) {
             callback(response)
         })
         .catch(error => {
-            console.log(error)
-            callback(null);
+             if (error.code === 'ECONNABORTED' && times < 3) {
+                doRequest(content,callback,times++)
+             } else {
+                callback(null);
+            }
         });
 }
 
