@@ -6,28 +6,31 @@ import {        Keypub,
         Keypriv,
         bech32PrivateKey,
         bech32PublicKey} from './getkey.js'
-
-
-const ndk = new NDK({
-    explicitRelayUrls: relays,
-    devWriteRelayUrls: relays,
-    signer:new NDKPrivateKeySigner(Keypriv)
-});
-
-await ndk.connect();
-let relaySets =  NDKRelaySet.fromRelayUrls(ndk._explicitRelayUrls, ndk);
-
-    setInterval(() => {
-        ndk.pool.relays.forEach((relay, key) => {
-            relay.connectivity._connectionStats.attempts = 1;
-        });
-    }, 10000);
+import {log} from './log.js'
 
 
 let kind    = 42
 
 
 export async function recv_task(eventid,handlerEvent ) {
+	let ndk = new NDK({
+    		explicitRelayUrls: relays,
+    		devWriteRelayUrls: relays,
+    		signer:new NDKPrivateKeySigner(Keypriv)
+	});
+
+	await ndk.connect();
+	let relaySets =  NDKRelaySet.fromRelayUrls(ndk._explicitRelayUrls, ndk);
+
+    	let attempts = setInterval(() => {
+        	ndk.pool.relays.forEach((relay, key) => {
+            	relay.connectivity._connectionStats.attempts = 1;
+        	});
+    	}, 10000);
+
+
+
+
     let filters = {"kinds":[42],"#e":[eventid],"limit":30}
 
     let sub = ndk.subscribe(filters,{},
@@ -42,10 +45,20 @@ export async function recv_task(eventid,handlerEvent ) {
             handlerEvent(Nevent);
 
     })
-
-    ndk.pool.on("relay:connect",(relay)=>{
+    
+    ndk.pool.on("relay:ready",(relay)=>{
+	log.gray(relay.url)
         relay.subscribe(sub, sub.filters);
     })
+
+    setTimeout(()=>{
+	clearInterval(attempts);
+	ndk.pool.off('relay:ready',() =>{})
+	sub = null;
+	ndk = null;
+	//start new ndk    
+	recv_task(eventid,handlerEvent );
+    }, 20 * 60 * 1000);
 	
 }
 
