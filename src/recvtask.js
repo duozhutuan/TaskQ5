@@ -11,6 +11,22 @@ import {log} from './log.js'
 
 let kind    = 42
 
+function timeSince(created_at){
+
+	// 当前时间戳 (毫秒)
+	const now = Date.now() / 1000;
+	// 计算时间差 (毫秒)
+	const timeDifference = now - created_at;
+
+	// 转换为天、小时、分钟和秒
+	const seconds = Math.floor(timeDifference);
+	const minutes = Math.floor(seconds / 60);
+	const hours = Math.floor(minutes / 60);
+	const days = Math.floor(hours / 24);
+
+	console.log(`New event publish at ${days}天 ${hours % 24}小时 ${minutes % 60}分钟 ${seconds % 60}秒 之前`);
+
+}
 
 export async function recv_task(eventid,handlerEvent ) {
 	let ndk = new NDK({
@@ -37,7 +53,8 @@ export async function recv_task(eventid,handlerEvent ) {
                         relaySets,true)
 
     sub.on("event" ,async (Nevent) => {
-
+	    timeSince(Nevent.created_at)
+	    
 	    if (rejectSelfTasks && Nevent.pubkey == Keypub){
                 console.log("rejectSelfTasks = true, Don't execute ",Keypub,"task")
                 return
