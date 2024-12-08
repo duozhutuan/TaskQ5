@@ -33,8 +33,8 @@ export async function send_task(content){
 
     //add identifer
     let identifer = String(Date.now());
-    let tags1 = tags	
-    tags1[0][1] = identifer;
+    let tags1     = JSON.parse(JSON.stringify(tags))	
+    tags1[0][1]   = identifer;
 
     tags1.push(["published_at",identifer ])
 
@@ -51,8 +51,8 @@ export async function update_task(content,eventid,identifer,pubkey) {
 
           if (content['status'] != 'done'){
                // update new status
-               let Nevent = new NDKEvent(ndk);
-               let tags1 = tags	
+               let Nevent  = new NDKEvent(ndk);
+               let tags1   = JSON.parse(JSON.stringify(tags))
                tags1[0][1] = identifer;
                tags1.push(["published_at",identifer ])
                content['status'] = 'done';
